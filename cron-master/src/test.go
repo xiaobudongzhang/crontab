@@ -4,7 +4,7 @@ import (
   "mycron/src/cron"
   "time"
   "mycron/src/lib"
-   "encoding/json"
+  "encoding/json"
   "io/ioutil"
   "log"
 )
@@ -28,8 +28,8 @@ func (d MyJob) Run() {
 
 
 func main(){
-      //test
-       cron := cron.New()
+      
+       
          //解析json
 	configData,err := ioutil.ReadFile("./config.json")
 	if err!=nil{
@@ -44,26 +44,39 @@ func main(){
 	    log.Fatal(err)
 	}
 	
-	//loop
-	//for _,v := range configs{
-	   // fmt.Printf(v.Cmd)
-	    //cron.AddFunc(v.Cron, func() {
 
-	    	lib.ExecShell("sleep 40")	    			
-	    //})
-	//}	     	
-	//start
-        t := time.Now()
-	fmt.Printf("start-time:")	 
-	fmt.Println(t.Unix());
+
+	lib.PrintNow("start-time")
+	
+       cron := cron.New()
+
+	//loop
+	for _,v := range configs{
+	    //闭包
+	    vtmp  := v
+	    cron.AddFunc(v.Cron, func() {
+		lib.ExecShell(vtmp.Cmd)
+	    })
+	}	     	
 		 
 	cron.Start()
 	defer cron.Stop()
 	
+
+
+        //远程控制停止重启
+	//time.Sleep(30 * time.Second)
+        //cron.Stop()
+	//time.Sleep(30 * time.Second)
+	//cron.Start()
 	
+	lib.Server(cron);
+
+	//最终超时兜底
 	select {
-	       case <-time.After(OneSecond*60*100):
-		    fmt.Printf("error")
+	       case <-time.After(OneSecond*1200):
+	       	 //   lib.PrintNow("end-time")
+		   // fmt.Printf("main error")
 	}
 
 }

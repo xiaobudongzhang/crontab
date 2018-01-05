@@ -1,20 +1,20 @@
 [
   {
-    "id":11,
-    "cron":"0 * * * * *",
-    "cmd":"sleep 15;date;echo 1",
-    "process":[]
+    "Id":11,
+    "Cron":"* * * * * *",
+    "Cmd":"sleep 15;date;echo 1",
+    "Process":[]
   },
   {
-    "id":12,
-    "cron":"0 * * * * *",
-    "cmd":"sleep 25;date;echo 2",
-    "process":[]
+    "Id":12,
+    "Cron":"* * * * * *",
+    "Cmd":"sleep 25;date;echo 2",
+    "Process":[]
   },
   {
-    "id":13,
-    "cron":"0 * * * * *",
-    "cmd":"ls -a",
-    "process":[]
+    "Id":13,
+    "Cron":"* * * * * *",
+    "Cmd":"ls -a",
+    "Process":[]
   }
 ]

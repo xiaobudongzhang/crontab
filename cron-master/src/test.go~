@@ -45,12 +45,15 @@ func main(){
 	}
 	
 	//loop
-	for _,v := range configs{
-	    
-	    cron.AddFunc(v.Cron, func() {
-	    	lib.ExecShell(v.Cmd)	    			
-	    })
-	}	     	
+	//for _,v := range configs{
+	   // fmt.Printf(v.Cmd)
+	    //cron.AddFunc(v.Cron, func() {
+
+	    	cancel :=lib.ExecShell("sleep 40")
+
+		cancel()	    			
+	    //})
+	//}	     	
 	//start
         t := time.Now()
 	fmt.Printf("start-time:")	 
