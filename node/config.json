@@ -1,0 +1,6 @@
+[
+  {
+    "cron":"* * * * *",
+    "cmd":"sleep 5;date;echo 1"
+  }
+]
