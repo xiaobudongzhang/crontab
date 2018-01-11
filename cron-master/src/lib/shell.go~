@@ -9,7 +9,7 @@ import (
 )
 
 func ExecShell(s string){
-  
+
   ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
   //ctx, cancel := context.WithCancel(context.Background())
   defer cancel()
@@ -32,7 +32,7 @@ func ExecShell(s string){
  
   time.Sleep(10 * time.Second)
   fmt.Println("退出程序中...", cmd.Process.Pid)
-  //cancel()
+  cancel()
 
    err = cmd.Wait()
  
