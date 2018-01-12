@@ -1,4 +1,4 @@
-package main
+package lib
 import (
   "bytes"
    "fmt"
@@ -12,12 +12,14 @@ import (
 
 func ExecShell(s string){
   
-  ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
+  ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
   //ctx, cancel := context.WithCancel(context.Background())
   defer cancel()
 
   //cmd := exec.Command("/bin/bash","-c",s)
   
+
+  fmt.Printf(s)
   cmd := exec.CommandContext(ctx, "/bin/bash", "-c", s)
 
    
@@ -33,6 +35,10 @@ func ExecShell(s string){
 
   err = cmd.Wait()
    
+  t := time.Now()
+  fmt.Printf("shell end time:")
+  fmt.Println(t.Unix());
+
   fmt.Printf("shell err:%v", err)
 }
 func main(){

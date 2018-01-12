@@ -10,7 +10,7 @@ import (
 )
 
 
-func ExecShell(s string){
+func ExecShell(s string,id int){
   
   ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
   //ctx, cancel := context.WithCancel(context.Background())
@@ -21,8 +21,8 @@ func ExecShell(s string){
 
   fmt.Printf(s)
   cmd := exec.CommandContext(ctx, "/bin/bash", "-c", s)
-
-   
+  
+  
   var out bytes.Buffer
   cmd.Stdout = &out
 
@@ -33,8 +33,14 @@ func ExecShell(s string){
 
   }
 
+  //将当前进程加入数据config中
+  nowPid := cmd.Process.Pid
+  DataConfigs[id].Process[nowPid]= DataProcess{nowPid}
+  
   err = cmd.Wait()
-   
+  //进程已结束，将当前进程数据信息从数据中移除  
+  delete(DataConfigs[id].Process, nowPid)
+  
   t := time.Now()
   fmt.Printf("shell end time:")
   fmt.Println(t.Unix());
@@ -46,7 +52,7 @@ func main(){
    fmt.Println("进程id.", os.Getpid())  
    //time.Sleep(20 * time.Second)
    
-   ExecShell("sleep 60")
+   //ExecShell("sleep 60")
    //time.Sleep(10 * time.Second)
    //cancel()  
 }

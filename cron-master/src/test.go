@@ -13,12 +13,7 @@ import (
 const OneSecond = 1*time.Second
 type MyJob struct{}
 
-type Config struct {
-    Id int
-    Cron string
-    Cmd string
-    Process []int
-}
+
 
 
 
@@ -37,39 +32,34 @@ func main(){
 	   log.Fatal(err)
 	}
 	
-	var configs []Config
+	var configs = lib.DataConfigs
 	errjson := json.Unmarshal(configData, &configs)
 	if errjson != nil {
 	    fmt.Println("error:", err.Error())
 	    log.Fatal(err)
 	}
+	lib.DataConfigs = configs
 	
-
 
 	lib.PrintNow("start-time")
 	
-       cron := cron.New()
-
+        cron := cron.New()
+       
 	//loop
 	for _,v := range configs{
 	    //闭包
 	    vtmp  := v
 	    cron.AddFunc(v.Cron, func() {
-		lib.ExecShell(vtmp.Cmd)
+		lib.ExecShell(vtmp.Cmd,vtmp.Id)
 	    })
-	}	     	
+	}
+	
 		 
 	cron.Start()
 	defer cron.Stop()
-	
 
-
-        //远程控制停止重启
-	//time.Sleep(30 * time.Second)
-        //cron.Stop()
-	//time.Sleep(30 * time.Second)
-	//cron.Start()
 	
+        //远程控制
 	lib.Server(cron);
 
 	//最终超时兜底

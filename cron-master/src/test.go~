@@ -4,7 +4,7 @@ import (
   "mycron/src/cron"
   "time"
   "mycron/src/lib"
-   "encoding/json"
+  "encoding/json"
   "io/ioutil"
   "log"
 )
@@ -13,12 +13,7 @@ import (
 const OneSecond = 1*time.Second
 type MyJob struct{}
 
-type Config struct {
-    Id int
-    Cron string
-    Cmd string
-    Process []int
-}
+
 
 
 
@@ -28,8 +23,8 @@ func (d MyJob) Run() {
 
 
 func main(){
-      //test
-       cron := cron.New()
+      
+       
          //解析json
 	configData,err := ioutil.ReadFile("./config.json")
 	if err!=nil{
@@ -37,35 +32,41 @@ func main(){
 	   log.Fatal(err)
 	}
 	
-	var configs []Config
+	var configs = lib.DataConfigs
 	errjson := json.Unmarshal(configData, &configs)
 	if errjson != nil {
 	    fmt.Println("error:", err.Error())
 	    log.Fatal(err)
 	}
+	lib.DataConfigs = configs
 	
+
+	lib.PrintNow("start-time")
+	
+       cron := cron.New()
+       
 	//loop
-	//for _,v := range configs{
-	   // fmt.Printf(v.Cmd)
-	    //cron.AddFunc(v.Cron, func() {
-
-	    	cancel :=lib.ExecShell("sleep 40")
-
-		cancel()	    			
-	    //})
-	//}	     	
-	//start
-        t := time.Now()
-	fmt.Printf("start-time:")	 
-	fmt.Println(t.Unix());
+	for _,v := range configs{
+	    //闭包
+	    vtmp  := v
+	    cron.AddFunc(v.Cron, func() {
+		lib.ExecShell(vtmp.Cmd,vtmp.Id)
+	    })
+	}
+	
 		 
 	cron.Start()
 	defer cron.Stop()
+
 	
-	
+        //远程控制
+	lib.Server(cron);
+
+	//最终超时兜底
 	select {
-	       case <-time.After(OneSecond*60*100):
-		    fmt.Printf("error")
+	       case <-time.After(OneSecond*1200):
+	       	 //   lib.PrintNow("end-time")
+		   // fmt.Printf("main error")
 	}
 
 }
