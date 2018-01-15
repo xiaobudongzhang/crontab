@@ -10,14 +10,13 @@ import (
    "encoding/json"
    "net/url"
    "strconv"
+   "os"
+   //"context"
+   "os/exec"
+   //"bytes"
+       "io/ioutil"
 )
 
-type Config struct {
-    Id int
-    Cron string
-    Cmd string
-    Process []int
-}
 
 
 const OneSecond = 1*time.Second
@@ -34,10 +33,23 @@ func Server(c *cron.Cron){
   })
 
 
-  http.HandleFunc("/setConfig", func(w http.ResponseWriter, r *http.Request) {
+  http.HandleFunc("/setConfig", func(w http.ResponseWriter, req *http.Request) {
     
-   fmt.Fprintf(w, "%s", html.EscapeString("200"))
-    ReLoad(c)    
+
+     body, err := ioutil.ReadAll(req.Body)
+    if err != nil {
+        panic(err)
+    }
+    //log.Println(string(body))
+    var configs map[int] DataConfig
+    err = json.Unmarshal(body, &configs)
+    if err != nil {
+        panic(err)
+    }
+    //log.Println(configs)   
+    
+    fmt.Fprintf(w, "%s", html.EscapeString("200"))
+    ReLoad(c,configs)    
      
   })
   
@@ -74,26 +86,53 @@ func Server(c *cron.Cron){
                 fmt.Fprintf(w, "%s", string(b))
   })
 
+  http.HandleFunc("/tree", func(w http.ResponseWriter, r *http.Request) {
+        ppid :=os.Getpid()
+	
+  //ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+  //defer cancel()
+  //cmd := exec.CommandContext(ctx, "pstree", "-p", strconv.Itoa(ppid))
+ cmd := exec.Command("pstree", "-p", strconv.Itoa(ppid))
+
+  //var out bytes.Buffer
+  //cmd.Stdout = &out
+
+
+  //err := cmd.Start()
+   //if err !=nil{
+    //fmt.Println("error:", err)
+  //}
+
+  outdata, err := cmd.Output()
+  //err = cmd.Wait()
+
+
+  if err != nil {
+       fmt.Println("error tree:", err)
+  }
+  //fmt.Printf("%s\n",outdata)
+  fmt.Fprintf(w, "%s", outdata)
+
+  })
+
 
   log.Fatal(http.ListenAndServe("169.254.87.130:8080", nil))
 }
 
 
 
-func ReLoad(c *cron.Cron){
+func ReLoad(c *cron.Cron, configs map[int] DataConfig){
     
-        str := []byte(`[{"Id": 11,"Cron": "*/5 * * * * *","Cmd": "sleep 33","Process": []}]`)
-     var configs []Config
-     json.Unmarshal(str, &configs)
-    
-  	     
+  	c.ClearEntry();   
         //loop
         for _,v := range configs{
             //闭包
+	    
             vtmp  := v
-            c.AddFunc(v.Cron, func() {
-                ExecShell(vtmp.Cmd,vtmp.Id)
+            log.Println(vtmp)
+	    
+	    c.AddFunc(v.Cron, func() {
+                ExecShell(vtmp.Cmd, vtmp.Id)
             })
-        }
-	
+        }	
 }

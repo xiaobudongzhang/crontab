@@ -64,9 +64,11 @@ func main(){
 
 	//最终超时兜底
 	select {
-	       case <-time.After(OneSecond*1200):
+	    //   case <-time.After(OneSecond*1200):
 	       	 //   lib.PrintNow("end-time")
 		   // fmt.Printf("main error")
 	}
 
 }
+
+

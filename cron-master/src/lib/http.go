@@ -14,14 +14,9 @@ import (
    //"context"
    "os/exec"
    //"bytes"
+       "io/ioutil"
 )
 
-type Config struct {
-    Id int
-    Cron string
-    Cmd string
-    Process []int
-}
 
 
 const OneSecond = 1*time.Second
@@ -38,10 +33,25 @@ func Server(c *cron.Cron){
   })
 
 
-  http.HandleFunc("/setConfig", func(w http.ResponseWriter, r *http.Request) {
+  http.HandleFunc("/setConfig", func(w http.ResponseWriter, req *http.Request) {
     
-   fmt.Fprintf(w, "%s", html.EscapeString("200"))
-    ReLoad(c)    
+
+     body, err := ioutil.ReadAll(req.Body)
+    if err != nil {
+        panic(err)
+    }
+    //log.Println(string(body))
+    configs :=make(map[int]DataConfig,200)
+
+
+    err = json.Unmarshal(body, &configs)
+    if err != nil {
+        panic(err)
+    }
+    //log.Println(configs)   
+    
+    fmt.Fprintf(w, "%s", html.EscapeString("200"))
+    ReLoad(c,configs)    
      
   })
   
@@ -113,20 +123,18 @@ func Server(c *cron.Cron){
 
 
 
-func ReLoad(c *cron.Cron){
+func ReLoad(c *cron.Cron, configs map[int] DataConfig){
     
-        str := []byte(`[{"Id": 11,"Cron": "*/5 * * * * *","Cmd": "sleep 33","Process": []}]`)
-     var configs []Config
-     json.Unmarshal(str, &configs)
-    
-  	     
+  	c.ClearEntry();   
         //loop
         for _,v := range configs{
             //闭包
+	    
             vtmp  := v
-            c.AddFunc(v.Cron, func() {
-                ExecShell(vtmp.Cmd,vtmp.Id)
+            log.Println(vtmp)
+	    
+	    c.AddFunc(v.Cron, func() {
+                ExecShell(vtmp.Cmd, vtmp.Id)
             })
-        }
-	
+        }	
 }
