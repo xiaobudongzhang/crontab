@@ -41,17 +41,17 @@ func Server(c *cron.Cron){
         panic(err)
     }
     //log.Println(string(body))
-    configs :=make(map[int]DataConfig,200)
-
-
-    err = json.Unmarshal(body, &configs)
+    //configs :=make(map[int]DataConfig,200)
+    
+    DataConfigs = nil
+    err = json.Unmarshal(body, &DataConfigs)
     if err != nil {
         panic(err)
     }
     //log.Println(configs)   
     
     fmt.Fprintf(w, "%s", html.EscapeString("200"))
-    ReLoad(c,configs)    
+    ReLoad(c,DataConfigs)    
      
   })
   

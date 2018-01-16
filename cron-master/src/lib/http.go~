@@ -41,7 +41,9 @@ func Server(c *cron.Cron){
         panic(err)
     }
     //log.Println(string(body))
-    var configs map[int] DataConfig
+    configs :=make(map[int]DataConfig,200)
+
+
     err = json.Unmarshal(body, &configs)
     if err != nil {
         panic(err)

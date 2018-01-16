@@ -38,8 +38,10 @@ func ExecShell(s string,id int){
 
   datap := DataProcess{nowPid}
   log.Println(datap)
-  DataConfigs[id].Process[nowPid] = datap
   log.Println(DataConfigs[id].Process)
+  log.Println(nowPid)
+  DataConfigs[id].Process[nowPid] = datap
+
   err = cmd.Wait()
   //进程已结束，将当前进程数据信息从数据中移除  
   delete(DataConfigs[id].Process, nowPid)
