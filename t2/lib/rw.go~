@@ -1,0 +1,17 @@
+package lib
+
+import (
+      // "time"
+)
+
+func NewRw(timeout int){
+      
+   //time.afterFunc(5 * time.Second,func(){
+   			  
+   	
+   //})
+
+}
+
+
+
